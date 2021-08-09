@@ -1,0 +1,6 @@
+[submodule "vendor/curlcpp"]
+	path = vendor/curlcpp
+	url = git@github.com:JosephP91/curlcpp.git
+[submodule "vendor/json"]
+	path = vendor/json
+	url = git@github.com:nlohmann/json.git
