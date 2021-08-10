@@ -1,0 +1,34 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - '**'
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: Setup premake
+        uses: abel0b/setup-premake@v1
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.0.2
+      - name: Restore from cache and install vcpkg
+        uses: lukka/run-vcpkg@v7
+        with:
+          setupOnly: true
+          vcpkgGitCommitId: 5568f110b509a9fd90711978a7cb76bae75bb092
+      - run: |
+          premake5 vs2019
+          $VCPKG_ROOT/vcpkg install curl:x64-windows-static
+          $VCPKG_ROOT/vcpkg integrate install
+        shell: bash
+      - run: msbuild /p:VcpkgUseStatic=true /p:Configuration=Release Injector.sln 
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          body: "<!--- Insert Changelog Here --->"
+          draft: true
+          files: bin/Release/Injector.exe
