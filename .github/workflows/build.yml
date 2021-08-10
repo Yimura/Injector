@@ -1,6 +1,10 @@
 name: Build
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
 jobs:
   build:
     runs-on: windows-latest
@@ -23,3 +27,7 @@ jobs:
           $VCPKG_ROOT/vcpkg integrate install
         shell: bash
       - run: msbuild /p:VcpkgUseStatic=true Injector.sln 
+      - uses: actions/upload-artifact@v2
+        with:
+          name: binary
+          path: bin/Debug/Injector.exe
