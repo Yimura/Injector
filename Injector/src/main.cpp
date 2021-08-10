@@ -34,7 +34,7 @@ int main()
 		std::string url = g_settings.dll_provider + "/YimMenu.dll";
 		download::file(url.c_str(), dll_name);
 
-		g_log->info("MAIN", "Downloaded DLL, new version %s", json["version"]);
+		g_log->info("MAIN", "Downloaded DLL, new version %s", json["version"].get<std::string>().c_str());
 
 		g_settings.version = json["version_machine"];
 		g_settings.attempt_save();
