@@ -4,6 +4,8 @@
 
 namespace injector
 {
+#define LOG_ARGS template <typename ...Args>
+
     class Logger
     {
     public:
@@ -32,29 +34,34 @@ namespace injector
         {
         }
 
-        void critical(const char* service, const char* message)
+        LOG_ARGS
+        void critical(const char* service, const char* format, Args&& ...args)
         {
-            this->log(LogLevel::Critical, service, message);
+            this->log(LogLevel::Critical, service, format, std::forward<Args>(args)...);
         }
 
-        void error(const char* service, const char* message)
+        LOG_ARGS
+        void error(const char* service, const char* format, Args&& ...args)
         {
-            this->log(LogLevel::Error, service, message);
+            this->log(LogLevel::Error, service, format, std::forward<Args>(args)...);
         }
 
-        void info(const char* service, const char* message)
+        LOG_ARGS
+        void info(const char* service, const char* format, Args&& ...args)
         {
-            this->log(LogLevel::Info, service, message);
+            this->log(LogLevel::Info, service, format, std::forward<Args>(args)...);
         }
 
-        void verbose(const char* service, const char* message)
+        LOG_ARGS
+        void verbose(const char* service, const char* format, Args&& ...args)
         {
-            this->log(LogLevel::Verbose, service, message);
+            this->log(LogLevel::Verbose, service, format, std::forward<Args>(args)...);
         }
 
-        void warning(const char* service, const char* message)
+        LOG_ARGS
+        void warning(const char* service, const char* format, Args&& ...args)
         {
-            this->log(LogLevel::Warning, service, message);
+            this->log(LogLevel::Warning, service, format, std::forward<Args>(args)...);
         }
 
 
@@ -72,7 +79,8 @@ namespace injector
 
         LogLevel m_log_level;
 
-        void log(LogLevel level, const char* service, const char* message)
+        LOG_ARGS
+        void log(LogLevel level, const char* service, const char* format, Args&& ...args)
         {
             const uint8_t alloc_size = 16;
 
@@ -108,6 +116,8 @@ namespace injector
                 break;
             }
 
+            char message[512];
+            sprintf(message, format, std::forward<Args>(args)...);
             std::cout << color << "[" << level_string << "/" << service << "] " << reset << message << std::endl;
         }
     };

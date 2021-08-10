@@ -18,15 +18,12 @@ namespace injector
 
 	bool Injector::inject(const char* target, const char* file)
 	{
-		char message[256];
-		sprintf(message, "Starting injection for %s into %s", file, target);
-		g_log->verbose("INJECTOR", message);
+		g_log->verbose("INJECTOR", "Starting injection for %s into %s", file, target);
 
 		char file_path[MAX_PATH];
 		if (_fullpath(file_path, file, sizeof(file_path)) == NULL || !std::filesystem::exists(file_path))
 		{
-			sprintf(message, "File %s given for injection could not be found.", file);
-			g_log->error("INJECTOR", message);
+			g_log->error("INJECTOR", "File %s given for injection could not be found.", file);
 
 			return false;
 		}
@@ -70,12 +67,12 @@ namespace injector
 		CloseHandle(hSnapshot);
 		if (!process_id)
 		{
-			g_log->error("INJECTOR", "Unable to find target process %s.");
+			g_log->error("INJECTOR", "Unable to find target process %s.", target);
 
 			return 0;
 		}
 
-		g_log->verbose("INJECTOR", "Found target process with process id %d");
+		g_log->verbose("INJECTOR", "Found target process with process id %d", process_id);
 
 		return process_id;
 	}
@@ -86,7 +83,7 @@ namespace injector
 		
 		if (!process_handle)
 		{
-			g_log->error("INJECTOR", "Failed to access process ID %d");
+			g_log->error("INJECTOR", "Failed to access process ID %d", process_id);
 
 			return false;
 		}
@@ -98,7 +95,7 @@ namespace injector
 
 	bool Injector::inject_into_process(const HANDLE process_handle, const char* file)
 	{
-		size_t dll_path_size = strlen(file) + 1;
+		const size_t dll_path_size = strlen(file) + 1;
 
 		g_log->verbose("INJECTOR", "Allocating DLL path.");
 		LPVOID alloc = VirtualAllocEx(process_handle, 0, dll_path_size, MEM_COMMIT, PAGE_EXECUTE);
