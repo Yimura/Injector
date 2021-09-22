@@ -11,6 +11,7 @@ workspace "Injector"
 	outputdir = "%{cfg.buildcfg}"
 
 	IncludeDir = {}
+	IncludeDir["http_request"] = "vendor/http_request/include"
 	IncludeDir["json"] = "vendor/json/single_include"
 
 	CppVersion = "C++17"
@@ -74,7 +75,7 @@ workspace "Injector"
 
 		includedirs
 		{
-			"%{IncludeDir.curlcpp}",
+			"%{IncludeDir.http_request}",
 			"%{IncludeDir.json}",
 			"%{prj.name}/src"
 		}
@@ -86,7 +87,7 @@ workspace "Injector"
 
 		links
 		{
-		
+			"ws2_32"
 		}
 
 		pchheader "%{PrecompileHeaderInclude}"
