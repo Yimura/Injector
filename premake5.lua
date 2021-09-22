@@ -11,7 +11,6 @@ workspace "Injector"
 	outputdir = "%{cfg.buildcfg}"
 
 	IncludeDir = {}
-	IncludeDir["curlcpp"] = "vendor/curlcpp/include"
 	IncludeDir["json"] = "vendor/json/single_include"
 
 	CppVersion = "C++17"
@@ -29,7 +28,6 @@ workspace "Injector"
 
 		defines
 		{
-		  "CURL_STATICLIB",
 		  "_CRT_SECURE_NO_WARNINGS",
 		  "NOMINMAX",
 		  "WIN32_LEAN_AND_MEAN",
@@ -54,28 +52,6 @@ workspace "Injector"
 		filter "not configurations:Debug"
 			defines { "NDEBUG" }
 	end
-
-	project "curlcpp"
-		location "vendor/%{prj.name}"
-		kind "StaticLib"
-		language "C++"
-
-		targetdir ("bin/lib/" .. outputdir)
-		objdir ("bin/lib/int/" .. outputdir .. "/%{prj.name}")
-
-		files
-		{
-			"vendor/%{prj.name}/src/*.cpp",
-			"vendor/%{prj.name}/include/*.h"
-		}
-
-		includedirs
-		{
-			"vendor/%{prj.name}/include"
-		}
-
-		DeclareMSVCOptions()
-		DeclareDebugOptions()
 
 	project "Injector"
 		location "%{prj.name}"
@@ -110,11 +86,7 @@ workspace "Injector"
 
 		links
 		{
-			"crypt32",
-			"ws2_32",
-			"wldap32",
-
-			"curlcpp"
+		
 		}
 
 		pchheader "%{PrecompileHeaderInclude}"
