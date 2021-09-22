@@ -12,26 +12,17 @@ namespace injector
 			char url[128];
 			sprintf(url, "%s/version.json", g_settings.dll_provider.c_str());
 
-			std::ostringstream stream;
-			curl::curl_ios<std::ostringstream> writer(stream);
-
-			curl::curl_easy easy(writer);
-
-			easy.add<CURLOPT_URL>(url);
-			easy.add<CURLOPT_FOLLOWLOCATION>(1L);
-
 			try
 			{
-				easy.perform();
+				http::Request req(url);
+				http::Response res = req.send("GET", "", {}, 2500ms);
 
-				return nlohmann::json::parse(stream.str());
+				return nlohmann::json::parse(res.body.begin(), res.body.end());
 			}
-			catch (const curl::curl_easy_exception& e)
+			catch (const std::exception&)
 			{
-				g_log->error("API", e.what());
+				return nullptr;
 			}
-
-			return nullptr;
 		}
 	};
 }

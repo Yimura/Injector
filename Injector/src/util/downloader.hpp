@@ -4,29 +4,31 @@
 namespace injector
 {
 	struct download {
-		inline static void file(const char* file_url, const char* location)
+		inline static bool file(const char* file_url, const char* location)
 		{
             std::ofstream file;
             file.open(location, std::ios::binary);
 
-            curl::curl_ios<std::ostream> writer(file);
-            curl::curl_easy easy(writer);
+			try
+			{
+				http::Request req(file_url);
+				http::Response res = req.send("GET", "", {}, 2500ms);
 
-            easy.add<CURLOPT_URL>(file_url);
-            easy.add<CURLOPT_FOLLOWLOCATION>(1L);
+				std::ostream_iterator<std::uint8_t> output_iter(file);
+				std::copy(res.body.begin(), res.body.end(), output_iter);
+			}
+			catch (const std::exception&)
+			{
+				g_log->warning("DOWNLOAD", "Failure while downloading, is the host reachable?");
 
-            try
-            {
-                easy.perform();
-            }
-            catch (curl::curl_easy_exception& e)
-            {
-                g_log->error("DOWNLOADER", e.what());
+				file.close();
 
-                e.print_traceback();
-            }
+				return false;
+			}
 
-            file.close();
+			file.close();
+
+			return true;
 		}
 	};
 }
