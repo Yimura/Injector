@@ -1,3 +1,6 @@
 [submodule "vendor/json"]
 	path = vendor/json
 	url = git@github.com:nlohmann/json.git
+[submodule "vendor/http_request"]
+	path = vendor/http_request
+	url = git@github.com:elnormous/HTTPRequest.git
