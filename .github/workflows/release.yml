@@ -28,7 +28,8 @@ jobs:
           msbuild /p:Configuration=Release /p:Platform=Win32 Injector.sln
 
       - name: Rename 32bit build executable
-        run: ren bin/Release/x32/Injector.exe bin/Release/x32/Injector_x32.exe
+        run: ren Injector.exe Injector_x32.exe
+        working-directory: bin/Release/x32
 
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -37,4 +38,4 @@ jobs:
           draft: true
           files: |
             bin/Release/x64/Injector.exe
-            bin/Release/x64/Injector_x32.exe
+            bin/Release/x32/Injector_x32.exe
