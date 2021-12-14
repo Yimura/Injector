@@ -23,15 +23,16 @@ jobs:
         run: premake5 vs2019
         shell: bash
 
-      - name: Build 32/64bit debug executables
+      - name: Build 32bit and 64bit debug executables
         run: |
-          msbuild /p:Configuration=Debug /p:Platform=x64 Injector.sln && \
+          msbuild /p:Configuration=Debug /p:Platform=x64 Injector.sln
           msbuild /p:Configuration=Debug /p:Platform=Win32 Injector.sln
 
       - name: Debug Build
         uses: actions/upload-artifact@v2
         with:
-          name: binary
+          name: binaries
           path: |
-            bin/x64/Debug/Injector.exe
-            bin/x32/Debug/Injector.exe
+            bin/Debug/*/*.exe
+            bin/Debug/*/*.map
+            bin/Debug/*/*.pdb
