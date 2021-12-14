@@ -22,15 +22,19 @@ jobs:
         run: premake5 vs2019
         shell: bash
 
-      - name: Build 32/64bit release executables
+      - name: Build 32bit and 64bit release executables
         run: |
-          msbuild /p:Configuration=Release /p:Platform=x64 Injector.sln && \
+          msbuild /p:Configuration=Release /p:Platform=x64 Injector.sln
           msbuild /p:Configuration=Release /p:Platform=Win32 Injector.sln
+
+      - name: Rename 32bit build executable
+        run: ren bin/Release/x32/Injector.exe bin/Release/x32/Injector_x32.exe
+
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           body: "<!--- Insert Changelog Here --->"
           draft: true
           files: |
-            bin/x64/Release/Injector.exe
-            bin/x32/Release/Injector.exe
+            bin/Release/x64/Injector.exe
+            bin/Release/x64/Injector_x32.exe
