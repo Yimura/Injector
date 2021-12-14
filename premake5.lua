@@ -4,7 +4,7 @@ workspace "Injector"
 	platforms { "x64", "x32" }
 	configurations { "Release", "Debug" }
 
-	outputdir = "%{cfg.platform}" ..  "/" .. "%{cfg.buildcfg}"
+	outputdir = "%{cfg.buildcfg}" ..  "/" .. "%{cfg.platform}"
 
 	IncludeDir = {}
 	IncludeDir["http_request"] = "vendor/http_request/include"
@@ -48,7 +48,7 @@ workspace "Injector"
 			symbols "On"
 		filter "not configurations:Debug"
 			defines { "NDEBUG" }
-			
+
 		filter "platforms:x32"
 			system "Windows"
 			architecture "x32"
