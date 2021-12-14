@@ -1,14 +1,10 @@
 workspace "Injector"
-	architecture "x64"
 	startproject "Injector"
 
-	configurations
-	{
-		"Debug",
-		"Release"
-	}
+	platforms { "x64", "x32" }
+	configurations { "Release", "Debug" }
 
-	outputdir = "%{cfg.buildcfg}"
+	outputdir = "%{cfg.platform}" ..  "/" .. "%{cfg.buildcfg}"
 
 	IncludeDir = {}
 	IncludeDir["http_request"] = "vendor/http_request/include"
@@ -52,6 +48,14 @@ workspace "Injector"
 			symbols "On"
 		filter "not configurations:Debug"
 			defines { "NDEBUG" }
+			
+		filter "platforms:x32"
+			system "Windows"
+			architecture "x32"
+
+		filter "platforms:x64"
+			system "Windows"
+			architecture "x64"
 	end
 
 	project "Injector"
@@ -61,6 +65,7 @@ workspace "Injector"
 
 		targetdir ("bin/" .. outputdir)
 		objdir ("bin/int/" .. outputdir .. "/%{prj.name}")
+		libdirs("bin/" .. outputdir .. "/%{prj.name}")
 
 		PrecompileHeaderInclude = "common.hpp"
 		PrecompileHeaderSource = "%{prj.name}/src/common.cpp"

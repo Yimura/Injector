@@ -1,0 +1,37 @@
+name: Debug Build
+
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+jobs:
+  debug:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Setup premake
+        uses: abel0b/setup-premake@v1
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.0.2
+
+      - name: Generate premake5 project
+        run: premake5 vs2019
+        shell: bash
+
+      - name: Build 32/64bit debug executables
+        run: |
+          msbuild /p:Configuration=Debug|x64 Injector.sln &&
+          msbuild /p:Configuration=Debug|Win32 Injector.sln
+
+      - name: Debug Build
+        uses: actions/upload-artifact@v2
+        with:
+          name: binary
+          path:
+            - bin/x64/Debug/Injector.exe
+            - bin/x32/Debug/Injector.exe
