@@ -24,8 +24,8 @@ jobs:
 
       - name: Build 32/64bit release executables
         run: |
-          msbuild /p:Configuration=Release|x64 Injector.sln && \
-          msbuild /p:Configuration=Release|Win32 Injector.sln
+          msbuild /p:Configuration=Release /p:Platform=x64 Injector.sln && \
+          msbuild /p:Configuration=Release /p:Platform=Win32 Injector.sln
       - name: Release
         uses: softprops/action-gh-release@v1
         with:

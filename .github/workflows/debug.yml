@@ -25,8 +25,8 @@ jobs:
 
       - name: Build 32/64bit debug executables
         run: |
-          msbuild /p:Configuration=Debug|x64 Injector.sln && \
-          msbuild /p:Configuration=Debug|Win32 Injector.sln
+          msbuild /p:Configuration=Debug /p:Platform=x64 Injector.sln && \
+          msbuild /p:Configuration=Debug /p:Platform=Win32 Injector.sln
 
       - name: Debug Build
         uses: actions/upload-artifact@v2
