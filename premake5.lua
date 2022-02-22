@@ -1,119 +1,128 @@
+function DeclareCommon()
+    staticruntime "Off"
+    floatingpoint "Fast"
+    vectorextensions "AVX2"
+
+    -- versions
+    systemversion "10.0"
+    toolset "v143"
+    cppdialect "C++20"
+
+    -- build output options
+    outputdir = "%{cfg.buildcfg}/%{cfg.platform}" -- "Release/x32" / "Release/x64" / "Debug/x32" / "Debug/x64"
+    targetdir   ("bin/" .. outputdir)
+    objdir      ("bin/int/" .. outputdir .. "/%{prj.name}")
+    libdirs     ("bin/" .. outputdir .. "/%{prj.name}")
+
+    --
+    defines {
+        "_CRT_SECURE_NO_WARNINGS", -- removes pesky warnings to use Microsoft "safer" variants of certain std:: functions
+        "NOMINMAX", -- excludes certain MINMAX macros
+        "WIN32_LEAN_AND_MEAN", -- excludes certain includes that we do not require from Windows.h
+    }
+end
+
+function does_file_exist(file)
+    local f = io.open(file,"r")
+    if f ~= nil then
+        io.close(f)
+
+        return true
+    end
+
+    return false
+end
+
 workspace "Injector"
-	startproject "Injector"
+    startproject "Injector"
 
-	platforms { "x64", "x32" }
-	configurations { "Release", "Debug" }
+    configurations { "Debug", "Release" }
+    platforms { "x64", "x32" }
 
-	outputdir = "%{cfg.buildcfg}" ..  "/" .. "%{cfg.platform}"
+    project "g3log"
+        location "vendor/%{prj.name}"
+        kind "StaticLib"
+        language "C++"
 
-	IncludeDir = {}
-	IncludeDir["http_request"] = "vendor/http_request/include"
-	IncludeDir["json"] = "vendor/json/single_include"
+        includedirs {
+            "vendor/%{prj.name}/src"
+        }
 
-	CppVersion = "C++17"
-	MsvcToolset = "v142"
-	WindowsSdkVersion = "10.0"
+        if not does_file_exist("vendor\\g3log\\src\\g3log\\generated_definitions.hpp") then
+            file = io.open("vendor\\g3log\\src\\g3log\\generated_definitions.hpp", "w")
 
-	function DeclareMSVCOptions()
-		filter "system:windows"
-		staticruntime "Off"
-		floatingpoint "Fast"
-		vectorextensions "AVX2"
-		systemversion (WindowsSdkVersion)
-		toolset (MsvcToolset)
-		cppdialect (CppVersion)
+            if file == nil then
+                premake.error("Failed to location g3log vendor directory, did you pull with --recurse?")
+            end
 
-		defines
-		{
-		  "_CRT_SECURE_NO_WARNINGS",
-		  "NOMINMAX",
-		  "WIN32_LEAN_AND_MEAN",
-		  "_WIN32_WINNT=0x601" -- Support Windows 7
-		}
+            file:write("#pragma once")
+        end
 
-		disablewarnings
-		{
-			"4068" -- C4068: unknown pragma X
-		}
+        files {
+            "vendor/%{prj.name}/src/**.hpp",
+            "vendor/%{prj.name}/src/**.cpp"
+        }
 
-		linkoptions
-		{
-			"-IGNORE:4286" -- symbol X defined in Y is imported by Z
-		}
-	end
+        removefiles {
+          "vendor/%{prj.name}/src/crashhandler_unix.cpp"
+        }
 
-	function DeclareDebugOptions()
-		filter "configurations:Debug"
-			defines { "_DEBUG" }
-			symbols "On"
-		filter "not configurations:Debug"
-			defines { "NDEBUG" }
+        DeclareCommon()
 
-		filter "platforms:x32"
-			system "Windows"
-			architecture "x32"
+    project "Injector"
+        location "src/"
+        kind "ConsoleApp"
+        language "C++"
 
-		filter "platforms:x64"
-			system "Windows"
-			architecture "x64"
-	end
+        includedirs {
+			"vendor/g3log/src",
+			"vendor/http_request/include",
+			"vendor/json/single_include",
+            "src/"
+        }
 
-	project "Injector"
-		location "%{prj.name}"
-		kind "ConsoleApp"
-		language "C++"
+        PrecompiledHeaderInclude = "Common.hpp"
+        PrecompiledHeaderSource = "src/Common.cpp"
 
-		targetdir ("bin/" .. outputdir)
-		objdir ("bin/int/" .. outputdir .. "/%{prj.name}")
-		libdirs("bin/" .. outputdir .. "/%{prj.name}")
+        files {
+            "src/**.hpp",
+            "src/**.cpp"
+        }
 
-		PrecompileHeaderInclude = "common.hpp"
-		PrecompileHeaderSource = "%{prj.name}/src/common.cpp"
+        libdirs {
+            "bin/lib"
+        }
 
-		files
-		{
-			"%{prj.name}/src/**.hpp",
-			"%{prj.name}/src/**.h",
-			"%{prj.name}/src/**.cpp",
-			"%{prj.name}/src/**.asm"
-		}
-
-		includedirs
-		{
-			"%{IncludeDir.http_request}",
-			"%{IncludeDir.json}",
-			"%{prj.name}/src"
-		}
-
-		libdirs
-		{
-			"bin/lib"
-		}
-
-		links
-		{
+        links {
+			"g3log",
+			"Psapi",
 			"ws2_32"
-		}
+        }
 
-		pchheader "%{PrecompileHeaderInclude}"
-		pchsource "%{PrecompileHeaderSource}"
+        pchheader "%{PrecompiledHeaderInclude}"
+        pchsource "%{PrecompiledHeaderSource}"
 
-		forceincludes
-		{
-			"%{PrecompileHeaderInclude}"
-		}
+        DeclareCommon()
 
-		DeclareMSVCOptions()
-		DeclareDebugOptions()
+        flags {
+            "LinkTimeOptimization",
+            "Maps",
+            "NoImportLib",
+            "MultiProcessorCompile"
+        }
 
-		flags { "NoImportLib", "Maps" }
+        filter "configurations:Debug"
+            flags {  }
+            symbols "On"
+            editandcontinue "Off"
+            defines { "DEBUG" }
 
-		filter "configurations:Debug"
-			flags { "LinkTimeOptimization", "MultiProcessorCompile" }
-			editandcontinue "Off"
-			defines { "INJECTOR_DEBUG" }
+        filter "configurations:Release"
+            flags { "NoManifest" }
+            defines { "RELEASE", "NDEBUG" }
+            optimize "speed"
 
-		filter "configurations:Release"
-			flags { "LinkTimeOptimization", "NoManifest", "MultiProcessorCompile" }
-			defines { "INJECTOR_RELEASE" }
-			optimize "speed"
+        filter "configurations:Dist"
+            flags { "FatalWarnings", "NoManifest" }
+            defines { "DIST", "NDEBUG" }
+            optimize "speed"
