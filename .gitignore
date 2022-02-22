@@ -4,3 +4,7 @@ bin/
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
+
+# Ignore auto generated files
+*.log
+*.json
