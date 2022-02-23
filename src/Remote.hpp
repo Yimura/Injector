@@ -9,6 +9,7 @@ namespace Remote
 		const std::string m_Path;
 		const std::string m_Version;
 		const int m_VersionMachine;
+		const bool m_Valid;
 	};
 
 	inline VersionInfo GetVersionInfo(const std::string_view dllProvider)
@@ -22,7 +23,7 @@ namespace Remote
 
 			nlohmann::json j = nlohmann::json::parse(res.body.begin(), res.body.end());
 
-			return { j["file"], j["version"], j["version_machine"] };
+			return { j["file"], j["version"], j["version_machine"], true };
 		}
 		catch (const std::exception&)
 		{

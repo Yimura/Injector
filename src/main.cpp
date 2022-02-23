@@ -23,6 +23,13 @@ int main(int argc, const char** argv)
 		dllFile = g.m_WebServer.m_File;
 
 		const auto versionInfo = Remote::GetVersionInfo(g.m_WebServer.m_DllProvider);
+		if (!versionInfo.m_Valid)
+		{
+			LOG(WARNING) << "Host did not return valid version data, does it have a version.json?";
+
+			return 1;
+		}
+
 		if (!std::filesystem::exists(dllFile) || g.m_WebServer.m_VersionMachine < versionInfo.m_VersionMachine)
 		{
 			if (!Remote::DownloadBinary(
