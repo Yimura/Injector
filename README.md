@@ -19,10 +19,12 @@ Then afterwards open Injector.sln and start coding.
 ## How to use
 
 This injector has 2 ways of functioning:
-- Automatic mode (webserver required)
-- Manual mode (Inject a dll in a target application)
+- Remote mode (webserver required)
+- Local mode (inject without webserver)
 
-### Automatic Mode
+### Setup Remote Server
+
+If you only wish to use the  local features just ignore this step and  skip to Injector settings.
 
 Requirements:
  - Webserver
@@ -37,27 +39,37 @@ In the root of your webserver create a file called `version.json`, this file wil
 }
 ```
 
+### Injector Settings
+
 If you run the injector for the first time and no `settings.json` is present in the folder from which you executed the Injector it will create an example file.
 
 ```js
 {
-    "dll_provider": "http://example.com", // the host from which to download updates
-    "target_application": "wordpad.exe", // the target application to inject into
-    "version": 11 // the version that is compared against on the server, this one should be lower than what's on the webserver
+    "application_mode": 0,
+    "injection_direction": 0,
+    "local": {
+        "file": "./some_dll.dll"
+    },
+    "target_application": "wordpad.exe",
+    "web_server": {
+        "dll_provider": "http://example.com",
+        "file": "latest.dll",
+        "version": -1
+    }
 }
 ```
 
-That's it.
+|Name|Description|Value|
+|--|--|--|
+|`application_mode` | If the injector runs locally or with a remote server. | `WEB_SERVER=0` & `LOCAL=1` |
+|`target_application`| The process name of the application to inject into.| `string`|
+|`local.file`|The local path to a DLL.|`string`|
+|`web_server.dll_provider`| Web Server origin. | `string` |
+|`web_server.file`|The file name to save the DLL to locally.|`string`|
+|`web_server.version`|Machine version integer to compare with the remote version.|`int`|
 
-### Manual Mode
-
-Alternatively you can set which program to inject into and which dll to use, open a terminal and pass 2 arguments:
-|Position|Argument|
-|--|--|
-|1|Target Application|
-|2|DLL to inject into the application|
-
-Example:
-```bash
-Injector.exe wordpad.exe example.dll
 ```
+injection_direction is currently not implemented, but still exists for future API.
+```
+
+That's it.
