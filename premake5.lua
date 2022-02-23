@@ -19,8 +19,10 @@ function DeclareCommon()
         "_CRT_SECURE_NO_WARNINGS", -- removes pesky warnings to use Microsoft "safer" variants of certain std:: functions
         "NOMINMAX", -- excludes certain MINMAX macros
         "WIN32_LEAN_AND_MEAN", -- excludes certain includes that we do not require from Windows.h
-		"CHANGE_G3LOG_DEBUG_TO_DBUG",
     }
+	
+	filter "configurations:Debug"
+		defines { "_DEBUG" }
 end
 
 function does_file_exist(file)
@@ -116,7 +118,7 @@ workspace "Injector"
             flags {  }
             symbols "On"
             editandcontinue "Off"
-            defines { "DEBUG" }
+            defines { "DEBUG", "CHANGE_G3LOG_DEBUG_TO_DBUG" }
 
         filter "configurations:Release"
             flags { "NoManifest" }
