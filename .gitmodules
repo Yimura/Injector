@@ -4,3 +4,6 @@
 [submodule "vendor/http_request"]
 	path = vendor/http_request
 	url = git@github.com:elnormous/HTTPRequest.git
+[submodule "vendor/g3log"]
+	path = vendor/g3log
+	url = https://github.com/KjellKod/g3log.git
