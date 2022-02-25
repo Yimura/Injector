@@ -42,6 +42,10 @@ int main(int argc, const char** argv)
 			LOG(INFO) << "Downloaded new DLL from remote, new DLL version is " << versionInfo.m_Version;
 		}
 
+		g.m_WebServer.m_VersionMachine = versionInfo.m_VersionMachine;
+		Settings::Save();
+		LOG(INFO) << "Saved new version to disk.";
+
 		break;
 	}
 
