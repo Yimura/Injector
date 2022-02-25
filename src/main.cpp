@@ -59,6 +59,34 @@ int main(int argc, const char** argv)
 	if (!dllFile.is_absolute())
 		dllFile = std::filesystem::absolute(dllFile);
 	LOG(INFO) << "Starting injection for " << dllFile.filename().string();
+
+	switch (Util::CheckIfFileIsValidDll(dllFile))
+	{
+	case DllValidityError::ACCESS_FAILURE:
+		LOG(WARNING) << "Failed to access DLL on disk.";
+
+		return 1;
+	case DllValidityError::TOO_SMALL:
+		LOG(WARNING) << "DLL file seems inconceivably small, request to inject ignored.";
+
+		return 1;
+	case DllValidityError::ALLOCATION_FAILURE:
+		LOG(WARNING) << "Failed to allocate memory when checking DLL file.";
+
+		return 1;
+	case DllValidityError::NOT_A_DLL:
+		LOG(WARNING) << "The file given does not appear to be a valid DLL.";
+
+		return 1;
+	case DllValidityError::INVALID_PLATFORM:
+		LOG(WARNING) << "The DLL given did not match the target platform the injector.";
+
+		return 1;
+	case DllValidityError::VALID:
+		LOG(INFO) << "DLL seems valid, proceeding with injection.";
+
+		break;
+	}
 	
 	const int processId = Injector::GetProcessId(targetApplication.data());
 	if (processId == -1)
