@@ -25,7 +25,7 @@ namespace Injector
 
 	inline int GetProcessId(std::string_view processName)
 	{
-		auto* target = Util::char_to_wchar(processName.data());
+		auto* target = Util::CharToWchar(processName.data());
 
 		const auto hToolHelpSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 		PROCESSENTRY32W processEntry32{};
